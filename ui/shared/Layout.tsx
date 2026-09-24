@@ -19,8 +19,15 @@ export function Row({
     </View>
   );
 }
-export function Actions({ children }: PropsWithChildren) {
-  return <View style={styles.actions}>{children}</View>;
+export function Actions({
+  children,
+  align = 'start',
+}: PropsWithChildren<{ align?: 'start' | 'end' }>) {
+  return (
+    <View style={[styles.actions, align === 'end' && styles.end]}>
+      {children}
+    </View>
+  );
 }
 const styles = StyleSheet.create({
   row: {
@@ -31,6 +38,7 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   between: { justifyContent: 'space-between' },
+  end: { justifyContent: 'flex-end' },
   actions: {
     flexDirection: 'row',
     alignItems: 'center',

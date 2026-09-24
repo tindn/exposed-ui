@@ -76,7 +76,7 @@ export function ScriptCommand({
               {error}
             </Typography>
           )}
-          <Actions>
+          <Actions align="end">
             <Button primary disabled={blocked} onPress={submit}>
               Run
             </Button>
