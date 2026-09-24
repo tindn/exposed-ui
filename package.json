@@ -1,0 +1,37 @@
+{
+  "name": "exposed-ui",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "index.ts",
+  "bin": {
+    "exposed": "bin/cli.js"
+  },
+  "scripts": {
+    "build": "npm run typecheck && npm run build:server && EXPO_NO_TYPESCRIPT_SETUP=1 expo export --platform web",
+    "dev": "EXPO_NO_TYPESCRIPT_SETUP=1 expo start --web",
+    "test": "npm run build:server && node --test build/server/*.test.js",
+    "typecheck": "tsc --noEmit",
+    "build:server": "tsc -p tsconfig.server.json",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "dependencies": {
+    "@expo/metro-runtime": "~57.0.16",
+    "expo": "~57.0.25",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-native": "0.86.3",
+    "react-native-web": "^0.21.2",
+    "zustand": "5.0.15"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.2",
+    "@types/react": "19.3.0",
+    "prettier": "3.9.9",
+    "typescript": "7.0.2"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

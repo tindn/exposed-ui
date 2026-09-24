@@ -1,0 +1,8 @@
+{
+  "expo": {
+    "name": "Exposed UI",
+    "slug": "exposed-ui",
+    "platforms": ["web"],
+    "web": { "bundler": "metro", "output": "single" }
+  }
+}

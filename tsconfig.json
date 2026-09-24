@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "Preserve",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "types": ["node", "react"],
+    "lib": ["ES2022", "DOM"],
+    "rewriteRelativeImportExtensions": true
+  },
+  "include": [
+    "App.tsx",
+    "index.ts",
+    "shared/**/*.ts",
+    "server/**/*.ts",
+    "components/**/*.tsx",
+    "components/**/*.ts",
+    "state/**/*.ts"
+  ],
+  "exclude": ["node_modules", "dist", "build"]
+}
