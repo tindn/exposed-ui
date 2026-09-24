@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { colors } from './shared/theme';
 import type { Job } from '../shared/types';
 import { parseArguments } from '../shared/arguments';
 import { errorMessage } from '../shared/types';
@@ -23,6 +25,7 @@ export function ScriptCommand({
   onRun,
   onStop,
 }: Props) {
+  const [expanded, setExpanded] = useState(false);
   const [argumentsText, setArgumentsText] = useState('');
   const [error, setError] = useState('');
   const blocked = disabled || !!running || name.startsWith('-');
@@ -38,35 +41,72 @@ export function ScriptCommand({
   }
   return (
     <Stack spacing="tight">
-      <Typography variant="label">{name}</Typography>
-      <CommandField label={`${name} command`} value={command} />
-      <Actions>
-        <TextField
-          accessibilityLabel={`${name} additional arguments`}
-          placeholder="Additional args, e.g. --clear"
-          value={argumentsText}
-          onChangeText={setArgumentsText}
-          onSubmitEditing={submit}
-        />
-      </Actions>
-      {!!error && (
-        <Typography accessibilityRole="alert" variant="warning">
-          {error}
-        </Typography>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`${name} script`}
+        accessibilityState={{ expanded }}
+        onPress={() => setExpanded((value) => !value)}
+        style={styles.summary}
+      >
+        <View style={styles.summaryText}>
+          <Typography variant="label">{name}</Typography>
+          {!expanded && (
+            <Text numberOfLines={1} ellipsizeMode="tail" style={styles.preview}>
+              {command}
+            </Text>
+          )}
+        </View>
+        {running && <Typography variant="hint">{running.status}</Typography>}
+        <Typography variant="hint">{expanded ? '▴' : '▾'}</Typography>
+      </Pressable>
+      {expanded && (
+        <Stack spacing="tight">
+          <CommandField label={`${name} command`} value={command} />
+          <Actions>
+            <TextField
+              accessibilityLabel={`${name} additional arguments`}
+              placeholder="Additional args, e.g. --clear"
+              value={argumentsText}
+              onChangeText={setArgumentsText}
+              onSubmitEditing={submit}
+            />
+          </Actions>
+          {!!error && (
+            <Typography accessibilityRole="alert" variant="warning">
+              {error}
+            </Typography>
+          )}
+          <Actions>
+            <Button primary disabled={blocked} onPress={submit}>
+              Run
+            </Button>
+            {running && (
+              <Button
+                disabled={disabled || running.status === 'stopping'}
+                onPress={onStop}
+              >
+                {running.status === 'stopping' ? 'Stopping…' : 'Stop'}
+              </Button>
+            )}
+          </Actions>
+        </Stack>
       )}
-      <Actions>
-        <Button primary disabled={blocked} onPress={submit}>
-          Run
-        </Button>
-        {running && (
-          <Button
-            disabled={disabled || running.status === 'stopping'}
-            onPress={onStop}
-          >
-            {running.status === 'stopping' ? 'Stopping…' : 'Stop'}
-          </Button>
-        )}
-      </Actions>
     </Stack>
   );
 }
+
+const styles = StyleSheet.create({
+  summary: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 4,
+  },
+  summaryText: { flex: 1, minWidth: 0, gap: 4 },
+  preview: {
+    color: colors.muted,
+    opacity: 0.7,
+    fontSize: 12,
+    fontFamily: 'monospace',
+  },
+});
