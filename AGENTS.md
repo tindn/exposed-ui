@@ -9,6 +9,20 @@ Guidance for human contributors and AI coding tools. Keep this file aligned with
 - Launch the dashboard independently → paste an Expo project folder path → run project scripts and interact with their terminals.
 - macOS is the verified platform. Linux is unverified; Windows is currently unsupported.
 
+## Motivation and guiding principles
+
+Make Expo development easy to resume, with less command recall, documentation lookup, and terminal juggling.
+
+- Expo CLI is useful, but returning after time away often requires looking up commands again. Make its capabilities discoverable and common actions easy to access.
+- Bring commands, devices, and running sessions into one place. Take inspiration from Xcode's cohesive run → observe → interact experience, while users edit code in their preferred editor.
+- Keep the purpose focused on a lightweight command and device dashboard. Evaluate new features by how much friction they remove from Expo development.
+- Fit the developer's existing workflow: launch independently → choose a project → expose its scripts → supply arguments → interact with the running CLI. Let the project's own commands drive the experience.
+- Reduce friction both at installation and during daily use. Favor straightforward setup, predictable behavior, and convenient access to frequently needed information.
+- Organize the interface around tasks. Keep commands close to their output and interaction; make secondary controls available without dominating the workspace.
+- Iterate through real use: use → notice friction → adjust → inspect again. Revisit earlier choices when the result feels worse.
+- Add structure as concrete needs emerge. Keep the implementation maintainable and let each architectural decision serve the tool's purpose.
+- Keep the project approachable through permissive licensing, concise documentation, and guidance usable by human contributors and different AI tools.
+
 ## Architecture
 
 - React Native components render through React Native Web; Expo exports the browser assets. The application runs in a browser with a local Node backend.
