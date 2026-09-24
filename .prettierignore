@@ -3,3 +3,5 @@ build/
 dist/
 .expo/
 .recent-projects.json*
+
+THIRD_PARTY_NOTICES.txt

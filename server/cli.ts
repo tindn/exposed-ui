@@ -1,3 +1,5 @@
+import { homedir } from 'node:os';
+import { readScripts, scriptCommand } from './scripts.js';
 import type { ServerResponse } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import type {
@@ -7,7 +9,7 @@ import type {
 } from '../shared/types.js';
 import { errorMessage } from '../shared/types.js';
 import { createServer } from 'node:http';
-import { readFile, stat, writeFile, rename } from 'node:fs/promises';
+import { readFile, stat, writeFile, rename, mkdir } from 'node:fs/promises';
 import { createReadStream, existsSync } from 'node:fs';
 import { loadProject } from './projects.js';
 import { fileURLToPath } from 'node:url';
@@ -24,7 +26,11 @@ if (process.argv.includes('--help')) {
   process.exit(0);
 }
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const recentFile = resolve(root, '.recent-projects.json');
+const recentFile = resolve(
+  process.env.XDG_CONFIG_HOME || resolve(homedir(), '.config'),
+  'exposed-ui',
+  'recent-projects.json',
+);
 let current: Awaited<ReturnType<typeof loadProject>> | null = null;
 let recentProjects: RecentProject[] = [],
   selecting = false;
@@ -60,6 +66,8 @@ const snapshot = (): DashboardState => ({
     name: current.name,
     path: current.path,
     expo: current.expo,
+    scripts: current.scripts,
+    packageManager: current.packageManager,
   },
   recentProjects,
   ...inventory,
@@ -130,6 +138,7 @@ const server = createServer(async (req, res) => {
             { name: next.name, path: next.path },
             ...recentProjects.filter((p) => p.path !== next.path),
           ].slice(0, 8);
+          await mkdir(dirname(recentFile), { recursive: true, mode: 0o700 });
           await writeFile(recentFile + '.tmp', JSON.stringify(recent), {
             mode: 0o600,
           });
@@ -143,8 +152,42 @@ const server = createServer(async (req, res) => {
           selecting = false;
         }
       }
+      if (url.pathname === '/api/scripts') {
+        if (!current || selecting)
+          return send(409, {
+            error: 'Select a project first and wait for pending actions.',
+          });
+        selecting = true;
+        try {
+          Object.assign(current, await readScripts(current.path));
+          broadcast();
+          return send(200, { ok: true });
+        } finally {
+          selecting = false;
+        }
+      }
       if (url.pathname === '/api/refresh') {
         void refresh();
+        return send(200, { ok: true });
+      }
+      if (url.pathname === '/api/input' || url.pathname === '/api/resize') {
+        if (typeof input.id !== 'string')
+          return send(400, { error: 'Expected a job id' });
+        if (url.pathname === '/api/input') {
+          if (typeof input.data !== 'string' || input.data.length > 1024)
+            return send(400, { error: 'Invalid terminal input' });
+          processes.input(input.id, input.data);
+        } else {
+          if (typeof input.cols !== 'number' || typeof input.rows !== 'number')
+            return send(400, { error: 'Expected terminal dimensions' });
+          processes.resize(input.id, input.cols, input.rows);
+        }
+        return send(200, { ok: true });
+      }
+      if (url.pathname === '/api/clear') {
+        if (typeof input.id !== 'string')
+          return send(400, { error: 'Expected a job id' });
+        processes.clear(input.id);
         return send(200, { ok: true });
       }
       if (url.pathname === '/api/stop') {
@@ -163,20 +206,26 @@ const server = createServer(async (req, res) => {
         return send(400, { error: 'Open an Expo project first.' });
       const project = current?.path || root;
       let id;
-      if (input.action === 'metro') {
-        id = processes.start(
-          'Metro',
-          process.execPath,
-          [
-            current!.cli,
-            'start',
-            '--port',
-            '8081',
-            ...(input.clear ? ['--clear'] : []),
-          ],
-          project,
-          'metro',
-        );
+      if (input.action === 'script') {
+        selecting = true;
+        try {
+          Object.assign(current!, await readScripts(project));
+          broadcast();
+          const { command, args } = scriptCommand(
+            current!,
+            input.name,
+            input.args,
+          );
+          id = processes.start(
+            `${command} ${args.join(' ')}`,
+            command,
+            args,
+            project,
+            `script:${input.name}`,
+          );
+        } finally {
+          selecting = false;
+        }
       } else {
         const device = inventory.devices.find(
           (d) => d.id === input.deviceId && d.type === input.deviceType,
@@ -253,7 +302,15 @@ const server = createServer(async (req, res) => {
     );
   }
 });
-server.listen(0, '127.0.0.1', () => {
+server.on('error', (error: NodeJS.ErrnoException) => {
+  console.error(
+    error.code === 'EADDRINUSE'
+      ? 'Port 3880 is already in use. Stop the existing process before starting Exposed UI.'
+      : `Unable to start Exposed UI: ${error.message}`,
+  );
+  process.exit(1);
+});
+server.listen(3880, '127.0.0.1', () => {
   origin = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
   const url = `${origin}/#${token}`;
   console.log(

@@ -83,7 +83,11 @@ export const useSession = create<Session>((set, get) => ({
       const result: ApiResult = await response.json();
       if (!response.ok) throw new Error(result.error);
       if (result.id) set({ selected: result.id });
-      if (path === 'project') set({ selected: null });
+      if (
+        path === 'project' ||
+        (path === 'clear' && 'id' in data && data.id === get().selected)
+      )
+        set({ selected: null });
       return true;
     } catch (error) {
       set(

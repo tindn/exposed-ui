@@ -5,7 +5,13 @@ import type { DashboardState } from '../shared/types.js';
 
 test('streamed logs preserve unrelated panel state and update the active job lifecycle', () => {
   const snapshot: DashboardState = {
-    project: { name: 'demo', path: '/demo', expo: '57' },
+    project: {
+      name: 'demo',
+      path: '/demo',
+      expo: '57',
+      scripts: {},
+      packageManager: 'npm',
+    },
     devices: [
       {
         id: 'phone',

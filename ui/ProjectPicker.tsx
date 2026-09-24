@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
-import { View, Text, Pressable, TextInput } from 'react-native';
+import { TextField } from './shared/TextField';
+import { Actions, Stack } from './shared/Layout';
+import { Typography } from './shared/Typography';
+import { Card } from './shared/Card';
+import { useState } from 'react';
+import { Pressable } from 'react-native';
 import type { RecentProject } from '../shared/types';
-import { Button } from './Button';
-import { colors, s } from './styles';
+import { Button } from './shared/Button';
 
 interface Props {
   hasProject: boolean;
@@ -25,31 +28,19 @@ export function ProjectPicker({
     if (await openProject(path)) onPathChange('');
   }
   return (
-    <View style={[s.card, { marginBottom: 24 }]}>
-      <Text style={s.heading}>
+    <Card>
+      <Typography variant="heading">
         {hasProject ? 'Switch project' : 'Open an Expo project'}
-      </Text>
-      <View style={[s.actions, { alignItems: 'center' }]}>
-        <TextInput
+      </Typography>
+      <Actions>
+        <TextField
           accessibilityLabel="Expo project folder"
           placeholder="~/projects/my-expo-app"
-          placeholderTextColor={colors.muted}
           value={projectPath}
           onChangeText={onPathChange}
           onSubmitEditing={() => {
             if (projectPath.trim() && !disabled && !hasActiveJobs)
               onOpen(projectPath);
-          }}
-          style={{
-            flex: 1,
-            minWidth: 180,
-            color: colors.text,
-            backgroundColor: colors.bg,
-            borderColor: colors.line,
-            borderWidth: 1,
-            borderRadius: 8,
-            padding: 12,
-            fontSize: 13,
           }}
         />
         <Button
@@ -59,20 +50,20 @@ export function ProjectPicker({
         >
           Open project
         </Button>
-      </View>
+      </Actions>
       {!!projectError && (
-        <Text accessibilityRole="alert" style={s.warning}>
+        <Typography accessibilityRole="alert" variant="warning">
           {projectError}
-        </Text>
+        </Typography>
       )}
       {!!hasActiveJobs && (
-        <Text style={s.hint}>
+        <Typography variant="hint">
           Stop running commands in Activity before switching projects.
-        </Text>
+        </Typography>
       )}
       {!!recentProjects.length && (
-        <View style={{ gap: 8 }}>
-          <Text style={s.eyebrow}>RECENT PROJECTS</Text>
+        <Stack spacing="tight">
+          <Typography variant="eyebrow">RECENT PROJECTS</Typography>
           {recentProjects.map((p) => (
             <Pressable
               accessibilityRole="button"
@@ -87,12 +78,12 @@ export function ProjectPicker({
                 paddingVertical: 6,
               }}
             >
-              <Text style={s.deviceName}>{p.name}</Text>
-              <Text style={s.hint}>{p.path}</Text>
+              <Typography variant="label">{p.name}</Typography>
+              <Typography variant="hint">{p.path}</Typography>
             </Pressable>
           ))}
-        </View>
+        </Stack>
       )}
-    </View>
+    </Card>
   );
 }

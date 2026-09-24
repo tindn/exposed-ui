@@ -5,3 +5,9 @@ dist/
 .recent-projects.json*
 
 build/
+
+*.tgz
+.env
+.env.*
+!.env.example
+.DS_Store

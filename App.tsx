@@ -1,36 +1,38 @@
-import React, { useEffect } from 'react';
-import { View, Text, ScrollView, useWindowDimensions } from 'react-native';
+import { useEffect } from 'react';
 import { connectSession } from './state/session';
+import { DashboardLayout } from './ui/DashboardLayout';
+import { Typography } from './ui/shared/Typography';
+import { Stack } from './ui/shared/Layout';
 import {
   SessionHeader,
   SessionProjectSummary,
   SessionProjectPicker,
-  SessionMetroPanel,
+  SessionScriptsPanel,
   SessionDevicesPanel,
   SessionActivityPanel,
   SessionErrors,
-} from './components/SessionPanels';
-import { s } from './components/styles';
+} from './ui/SessionPanels';
 
 export default function App() {
-  const { width } = useWindowDimensions();
   useEffect(connectSession, []);
   return (
-    <View style={s.root}>
-      <SessionHeader />
-      <ScrollView contentContainerStyle={s.page}>
-        <SessionProjectSummary />
-        <SessionProjectPicker />
-        <SessionErrors />
-        <View style={[s.columns, width < 900 && { flexDirection: 'column' }]}>
-          <View style={[s.sidebar, width < 900 && { width: '100%' }]}>
-            <SessionMetroPanel />
-            <SessionDevicesPanel />
-          </View>
-          <SessionActivityPanel />
-        </View>
-        <Text style={s.footer}>EXPOSED UI / YOUR PROJECT, IN VIEW.</Text>
-      </ScrollView>
-    </View>
+    <DashboardLayout
+      header={<SessionHeader />}
+      project={
+        <Stack spacing="roomy">
+          <SessionProjectSummary />
+          <SessionProjectPicker />
+          <SessionErrors />
+        </Stack>
+      }
+      devices={<SessionDevicesPanel />}
+      scripts={<SessionScriptsPanel />}
+      activity={<SessionActivityPanel />}
+      footer={
+        <Typography variant="eyebrow">
+          EXPOSED UI / YOUR PROJECT, IN VIEW.
+        </Typography>
+      }
+    />
   );
 }

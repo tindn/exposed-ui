@@ -1,6 +1,7 @@
+import { StyleSheet } from 'react-native';
+import { colors } from './theme';
 import React from 'react';
 import { Pressable, Text } from 'react-native';
-import { colors, s } from './styles';
 export function Button({
   children,
   onPress,
@@ -30,3 +31,15 @@ export function Button({
     </Pressable>
   );
 }
+
+const s = StyleSheet.create({
+  button: {
+    borderWidth: 1,
+    borderColor: '#465140',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  primary: { backgroundColor: colors.green, borderColor: colors.green },
+  buttonText: { color: colors.text, fontSize: 12, fontWeight: '600' },
+});

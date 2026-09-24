@@ -1,14 +1,12 @@
-import React from 'react';
-import { Text } from 'react-native';
+import { Notice } from './shared/Notice';
 import { useShallow } from 'zustand/react/shallow';
 import { useSession, selectDisabled } from '../state/session';
 import { Header } from './Header';
 import { ProjectSummary } from './ProjectSummary';
 import { ProjectPicker } from './ProjectPicker';
-import { MetroPanel } from './MetroPanel';
+import { ScriptsPanel } from './ScriptsPanel';
 import { DevicesPanel } from './DevicesPanel';
 import { ActivityPanel } from './ActivityPanel';
-import { s } from './styles';
 
 export function SessionHeader() {
   const connected = useSession((state) => state.connected);
@@ -38,20 +36,21 @@ export function SessionProjectPicker() {
     />
   );
 }
-export function SessionMetroPanel() {
-  const { metro, hasProject, action } = useSession(
+export function SessionScriptsPanel() {
+  const { project, active, action } = useSession(
     useShallow((state) => ({
-      metro: state.active.find((job) => job.kind === 'metro'),
-      hasProject: !!state.project,
+      project: state.project,
+      active: state.active,
       action: state.action,
     })),
   );
   const disabled = useSession(selectDisabled);
   return (
-    <MetroPanel
-      {...{ metro, hasProject, disabled }}
-      onStart={(clear) => action('run', { action: 'metro', clear })}
+    <ScriptsPanel
+      {...{ project, active, disabled }}
+      onRun={(name, args) => action('run', { action: 'script', name, args })}
       onStop={(id) => action('stop', { id })}
+      onRefresh={() => action('scripts')}
     />
   );
 }
@@ -105,6 +104,7 @@ export function SessionActivityPanel() {
       {...{ jobs, activeCount, selected, disabled }}
       onSelect={select}
       onStop={(id) => action('stop', { id })}
+      onClear={(id) => action('clear', { id })}
     />
   );
 }
@@ -113,16 +113,12 @@ export function SessionErrors() {
   const token = useSession((state) => state.token);
   return (
     <>
-      {!!error && (
-        <Text accessibilityRole="alert" style={s.error}>
-          {error}
-        </Text>
-      )}
+      {!!error && <Notice>{error}</Notice>}
       {!token && (
-        <Text style={s.error}>
+        <Notice>
           Open the full session URL printed by the CLI. For UI development,
           export the web build and launch bin/cli.js.
-        </Text>
+        </Notice>
       )}
     </>
   );

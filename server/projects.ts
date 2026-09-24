@@ -1,3 +1,4 @@
+import { readScripts } from './scripts.js';
 import { readFile, realpath } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { resolve, dirname, isAbsolute } from 'node:path';
@@ -44,5 +45,6 @@ export async function loadProject(input: unknown) {
     path,
     expo: version,
     cli,
+    ...(await readScripts(path)),
   };
 }

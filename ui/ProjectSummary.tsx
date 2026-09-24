@@ -1,7 +1,8 @@
-import React from 'react';
+import { StyleSheet } from 'react-native';
+import { colors } from './shared/theme';
+import { Typography } from './shared/Typography';
 import { View, Text } from 'react-native';
 import type { Project } from '../shared/types';
-import { s } from './styles';
 
 interface Props {
   project: Project | null;
@@ -10,7 +11,7 @@ export function ProjectSummary({ project }: Props) {
   return (
     <View style={s.projectRow}>
       <View style={{ flex: 1 }}>
-        <Text style={s.eyebrow}>WORKSPACE</Text>
+        <Typography variant="eyebrow">WORKSPACE</Typography>
         <Text style={s.projectName}>
           {project?.name || 'Connect your project'}
         </Text>
@@ -22,3 +23,19 @@ export function ProjectSummary({ project }: Props) {
     </View>
   );
 }
+
+const s = StyleSheet.create({
+  projectRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  projectName: {
+    color: colors.text,
+    fontSize: 30,
+    fontWeight: '600',
+    letterSpacing: -1,
+  },
+  path: { color: colors.muted, fontSize: 12, marginTop: 8 },
+  meta: { color: colors.muted, fontSize: 11 },
+});

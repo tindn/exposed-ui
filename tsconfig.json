@@ -17,8 +17,8 @@
     "index.ts",
     "shared/**/*.ts",
     "server/**/*.ts",
-    "components/**/*.tsx",
-    "components/**/*.ts",
+    "ui/**/*.tsx",
+    "ui/**/*.ts",
     "state/**/*.ts"
   ],
   "exclude": ["node_modules", "dist", "build"]
