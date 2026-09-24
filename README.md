@@ -4,13 +4,14 @@ A local control panel for Expo. React Native Web UI, Expo web export, and a loca
 
 ## Install
 
-The first registry release is being prepared. Once published:
+Install with Homebrew:
 
 ```sh
-npx exposed-ui
+brew install tindn/tap/exposed-ui
+exposed
 ```
 
-Or install globally with `npm install -g exposed-ui`, then run `exposed`.
+The formula installs Node and the dashboard. Your Expo project still needs its own dependencies and package manager installed. Release archives are also available on [GitHub Releases](https://github.com/tindn/exposed-ui/releases). No npm account is needed.
 
 ## Setup from source
 
